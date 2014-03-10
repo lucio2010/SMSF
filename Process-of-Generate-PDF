@@ -1,0 +1,60 @@
+    /// <summary>
+    ///  To replace all the merges field on the pdf template
+    /// </summary>
+    /// <param name="fileTemplate">template name</param>
+    /// <param name="fileNew">the new pdf file</param>
+    /// <param name="hshTable">the datasource for the merge fields</param>
+    /// <returns>the new pdf file name</returns>
+    private string GetPDFFileName(string fileTemplate, string fileNew, Hashtable hshTable)
+    {
+        string strReturn = string.Empty;
+        using (var existingFileStream = new FileStream(fileTemplate, FileMode.Open))
+        using (var newFileStream = new FileStream(fileNew, FileMode.Create))
+        {
+
+            // Open existing PDF  
+            var pdfReader = new PdfReader(existingFileStream);
+
+            // PdfStamper, which will create  
+            PdfStamper stamper = new PdfStamper(pdfReader, newFileStream);
+            var form = stamper.AcroFields;
+            var fieldKeys = form.Fields.Keys;
+            string strFieldValue = string.Empty;
+            //int i = 0;
+            foreach (string fieldKey in fieldKeys)
+            {
+                strFieldValue = GetFieldValue(hshTable, form.GetField(fieldKey));
+                form.SetField(fieldKey, strFieldValue);
+
+                #region  some special logic for the image fields
+                //{
+                if (fieldKey.Contains("txtmockup1") && hshTable["«trust2fname»"].ToString() != "")
+                {
+                    form.SetFieldProperty(fieldKey, "flags", PdfAnnotation.FLAGS_PRINT |
+                                                             PdfAnnotation.FLAGS_HIDDEN, null);
+                }
+                if (fieldKey.Contains("txtmockup2") && hshTable["«trust3fname»"].ToString() != "")
+                {
+                    form.SetFieldProperty(fieldKey, "flags", PdfAnnotation.FLAGS_PRINT |
+                                                             PdfAnnotation.FLAGS_HIDDEN, null);
+                }
+                if (fieldKey.Contains("txtmockup3") && hshTable["«trust4fname»"].ToString() != "")
+                {
+                    form.SetFieldProperty(fieldKey, "flags", PdfAnnotation.FLAGS_PRINT |
+                                                             PdfAnnotation.FLAGS_HIDDEN, null);
+                }
+                //}
+
+                #endregion
+            }
+            //Compress the PDF file
+            stamper.SetFullCompression();
+            // "Flatten" the form so it wont be editable/usable anymore  
+            stamper.FormFlattening = true;
+            stamper.Close();
+            pdfReader.Close();
+        }
+
+        strReturn = fileNew;
+        return strReturn;
+    }
