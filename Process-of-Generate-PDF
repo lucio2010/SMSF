@@ -1,6 +1,5 @@
     /// <summary>
     ///  To replace all the merges field on the pdf template
-    ///  [smsf](http://esuperfund.com.au/Images/logo-esuperfundnew.jpg)
     /// </summary>
     /// <param name="fileTemplate">template name</param>
     /// <param name="fileNew">the new pdf file</param>
