@@ -1,0 +1,49 @@
+  using System;
+  using System.Data;
+  using System.Web;
+  using Aspose.Cells;
+
+    /// <summary>
+    /// Use the apose.cell to export an excel file
+    /// </summary>
+    /// <returns>return the excel file name</returns>
+    public static string ExportExcelData()
+    {
+        //Instantiate an instance of license and set the license file through its path
+        Aspose.Cells.License license = new Aspose.Cells.License();
+        license.SetLicense("Aspose.Cells.lic");
+        Workbook workbook = new Workbook();
+        Worksheet worksheet = workbook.Worksheets[0];
+        worksheet.Cells[0, 0].PutValue("col1");//a
+        worksheet.Cells[0, 1].PutValue("col2");//b
+        worksheet.Name = "worksheet1";//set worksheet name
+        string strFileName = HttpContext.Current.Server.MapPath("~/" + "ClientData.xls");
+        workbook.Save(strFileName);
+        return workbook.FileName;
+    }
+    
+    
+    /// <summary>
+    /// Import/read the data from an excel file
+    /// </summary>
+    /// <param name="filePath">the full path of an excel file</param>
+    private void FixedExcelSpacesInDoubleField(string filePath)
+    {
+        Workbook w = new Workbook(filePath);
+        Worksheet worksheet = w.Worksheets[0];
+        w.Settings.CultureInfo = CultureInfo.GetCultureInfo("en-AU");
+        //DataTable dt = worksheet.Cells.ExportDataTable(1, 0, worksheet.Cells.MaxRow, 49); change the excel into a data table
+        int rowsNum = worksheet.Cells.MaxRow;
+        for (int i = 1; i < rowsNum; i++)
+        {
+            //to loop each cell
+            for(int j=0;j<49;j++)
+            {
+                if(worksheet.Cells[i,j].StringValue.Trim()=="")
+                {
+                    worksheet.Cells[i,j].PutValue(null);
+                }
+            }
+        }
+        w.Save(filePath);
+    }
