@@ -59,3 +59,46 @@
         strReturn = fileNew;
         return strReturn;
     }
+
+
+    /// <summary>
+    /// Merge the separate pdf document into one big file
+    /// </summary>
+    /// <param name="fileList">pdf file list</param>
+    /// <param name="outMergeFile">output the pdf</param>
+    /// <param name="bolIsDeleted">whether to delete the single pdf files or not</param>
+    private void mergePDFFiles(string[] fileList, string outMergeFile, bool bolIsDeleted)
+    {
+        PdfReader reader;
+        Document document = new Document();
+        PdfWriter writer = PdfWriter.GetInstance(document, new FileStream(outMergeFile, FileMode.Create));
+        document.Open();
+        PdfContentByte cb = writer.DirectContent;
+        PdfImportedPage newPage;
+        for (int i = 0; i < fileList.Length; i++)
+        {
+            if (!string.IsNullOrEmpty(fileList[i]))
+            {
+                reader = new PdfReader(fileList[i]);
+                int iPageNum = reader.NumberOfPages;
+                for (int j = 1; j <= iPageNum; j++)
+                {
+                    document.NewPage();
+                    newPage = writer.GetImportedPage(reader, j);
+                    cb.AddTemplate(newPage, 0, 0);
+                }
+            }
+        }
+        // writer.AddJavaScript();//developer can add some acro javascript into the pdf doc.
+        document.Close();
+        if (bolIsDeleted)
+        {
+            foreach (string fileName in fileList)
+            {
+                if (File.Exists(fileName))
+                {
+                    File.Delete(fileName);
+                }
+            }
+        }
+    }
