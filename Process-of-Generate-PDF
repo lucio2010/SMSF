@@ -1,3 +1,13 @@
+    using System;
+    using System.Collections;
+    using System.Configuration;
+    using System.IO;
+    using System.Web;
+    using System.Data;
+    using System.Text;
+    using iTextSharp.text;
+    using iTextSharp.text.pdf;
+        
     /// <summary>
     ///  To replace all the merges field on the pdf template
     /// </summary>
